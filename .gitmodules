@@ -1,0 +1,4 @@
+[submodule "rensv-controller"]
+	path = rensv-controller
+	url = https://github.com/ECCNetLab/rensv-controller.git
+	branch = feature/create_web_controller

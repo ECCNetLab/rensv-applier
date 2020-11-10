@@ -12,3 +12,7 @@ docker-build: build
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: docker-build
 	kubectl apply -f k8s/
+
+# Delete the applyer
+delete:
+	kubectl delete -f k8s/

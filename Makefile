@@ -11,4 +11,4 @@ docker-build: build
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: docker-build
-	kubectl run --rm applyer --image=${IMG} --image-pull-policy=IfNotPresent
+	kubectl apply -f k8s/

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applyer
+  labels:
+    app: applyer
+spec:
+  selector:
+    matchLabels:
+      app: applyer
+  template:
+    metadata:
+      labels:
+        app: applyer
+    spec:
+      serviceAccountName: applyer-sa
+      containers:
+      - name: applyer
+        image: rensv-applyer:v1
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

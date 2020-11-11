@@ -31,7 +31,7 @@ func main() {
 
 	q, err := ch.QueueDeclare(
 		"rensv", // name
-		false,   //durable
+		false,   // durable
 		false,   // delete when unused
 		false,   // exclusive
 		false,   // no-wait
@@ -96,14 +96,28 @@ func main() {
 				Do(context.Background()).
 				Into(result)
 			if err != nil {
-				log.Fatalf("Error while creating object: %s\n", err)
+				log.Printf("Error while creating object: %s\n", err)
+				err = ch.Publish(
+					"",     // exchange
+					q.Name, // routing key
+					false,  // mandatory
+					false,  // immediate
+					amqp.Publishing{
+						ContentType: "text/plain",
+						Body:        d.Body,
+					},
+				)
+				log.Printf(" [x] Requeue %s", d.Body)
+				if err != nil {
+					log.Printf("Failed to publish a message: %s\n", err)
+				}
 			} else {
 				log.Printf("object created: %v\n", result)
 			}
 		}
 	}()
 
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
+	log.Printf(" [*] Waiting for messages...")
 	<-forever
 }
 

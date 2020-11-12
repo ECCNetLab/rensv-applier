@@ -12,16 +12,19 @@ type Amqp struct {
 
 // NewClient はConsumerとしての接続までをする
 func NewClient(url string) (mq Amqp, err error) {
+	// MQへの接続
 	mq.Connection, err = amqp.Dial(url)
 	if err != nil {
 		return mq, err
 	}
 
+	// チャンネル生成
 	mq.Channel, err = mq.Connection.Channel()
 	if err != nil {
 		return mq, err
 	}
 
+	// Exchangeの定義
 	err = mq.Channel.ExchangeDeclare(
 		"test",   // name
 		"direct", // type
@@ -35,6 +38,7 @@ func NewClient(url string) (mq Amqp, err error) {
 		return mq, err
 	}
 
+	// Queueの定義
 	mq.Queue, err = mq.Channel.QueueDeclare(
 		"routing-key", // name
 		false,         // durable
@@ -47,6 +51,7 @@ func NewClient(url string) (mq Amqp, err error) {
 		return mq, err
 	}
 
+	// 受信する際の定義
 	mq.Messages, err = mq.Channel.Consume(
 		mq.Queue.Name, // queue
 		"",            // consumer

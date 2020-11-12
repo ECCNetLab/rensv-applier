@@ -59,6 +59,19 @@ func NewClient(url string) (mq Amqp, err error) {
 		return mq, err
 	}
 
+	// Queueのbindを定義
+	err = mq.Channel.QueueBind(
+		mq.Queue.Name, // queue name
+		mq.Queue.Name, // routing key
+		"test",        // exchange
+		false,         // no-wait
+		nil,           // arguments
+	)
+	if err != nil {
+		log.Println("Failed to bind a queue")
+		return mq, err
+	}
+
 	// 受信する際の定義
 	mq.Messages, err = mq.Channel.Consume(
 		mq.Queue.Name, // queue

@@ -70,7 +70,7 @@ func NewClient(url string) (mq Amqp, err error) {
 
 // Publish は引数のデータをqueueに投げる
 func (a Amqp) Publish(msg []byte) error {
-	a.Channel.Publish(
+	err := a.Channel.Publish(
 		"test",       // exchange
 		a.Queue.Name, // routing key
 		false,        // mandatory
@@ -80,7 +80,7 @@ func (a Amqp) Publish(msg []byte) error {
 			Body:        msg,
 		},
 	)
-	return nil
+	return err
 }
 
 // Close はConnectionとChannelを閉じます

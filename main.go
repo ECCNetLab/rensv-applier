@@ -20,7 +20,7 @@ type Rensv struct {
 
 func main() {
 	// MQ接続
-	queue, err := NewClient("amqp://hoge:****@example.com:5672/")
+	queue, err := NewClient("amqp://guest:guest@127.0.0.1:5672/")
 	FailOnError(err)
 	defer queue.Close()
 

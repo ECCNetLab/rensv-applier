@@ -22,13 +22,26 @@ func NewClient(url string) (mq Amqp, err error) {
 		return mq, err
 	}
 
+	err = mq.Channel.ExchangeDeclare(
+		"test",   // name
+		"direct", // type
+		false,    // durable
+		false,    // auto-deleted
+		false,    // internal
+		false,    // no-wait
+		nil,      // arguments
+	)
+	if err != nil {
+		return mq, err
+	}
+
 	mq.Queue, err = mq.Channel.QueueDeclare(
-		"rensv", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		"routing-key", // name
+		false,         // durable
+		false,         // delete when unused
+		false,         // exclusive
+		false,         // no-wait
+		nil,           // arguments
 	)
 	if err != nil {
 		return mq, err
@@ -43,6 +56,9 @@ func NewClient(url string) (mq Amqp, err error) {
 		false,         // no-wait
 		nil,           // args
 	)
+	if err != nil {
+		return mq, err
+	}
 
 	return mq, nil
 }
@@ -50,7 +66,7 @@ func NewClient(url string) (mq Amqp, err error) {
 // Publish は引数のデータをqueueに投げる
 func (a Amqp) Publish(msg []byte) error {
 	a.Channel.Publish(
-		"",           // exchange
+		"test",       // exchange
 		a.Queue.Name, // routing key
 		false,        // mandatory
 		false,        // immediate

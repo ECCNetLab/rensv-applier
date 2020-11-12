@@ -1,6 +1,10 @@
 package main
 
-import "github.com/streadway/amqp"
+import (
+	"log"
+
+	"github.com/streadway/amqp"
+)
 
 // Amqp はMQとの通信に必要なデータの定義
 type Amqp struct {
@@ -15,12 +19,14 @@ func NewClient(url string) (mq Amqp, err error) {
 	// MQへの接続
 	mq.Connection, err = amqp.Dial(url)
 	if err != nil {
+		log.Println("Failed to connect to RabbitMQ")
 		return mq, err
 	}
 
 	// チャンネル生成
 	mq.Channel, err = mq.Connection.Channel()
 	if err != nil {
+		log.Println("Failed to open a channel")
 		return mq, err
 	}
 
@@ -35,6 +41,7 @@ func NewClient(url string) (mq Amqp, err error) {
 		nil,      // arguments
 	)
 	if err != nil {
+		log.Println("Failed to declare an exchange")
 		return mq, err
 	}
 
@@ -48,6 +55,7 @@ func NewClient(url string) (mq Amqp, err error) {
 		nil,           // arguments
 	)
 	if err != nil {
+		log.Println("Failed to declare a queue")
 		return mq, err
 	}
 
@@ -62,6 +70,7 @@ func NewClient(url string) (mq Amqp, err error) {
 		nil,           // args
 	)
 	if err != nil {
+		log.Println("Failed to register a consumer")
 		return mq, err
 	}
 

@@ -22,6 +22,7 @@ func main() {
 	// MQ接続
 	queue, err := NewClient("amqp://hoge:****@example.com:5672/")
 	FailOnError(err)
+	defer queue.Close()
 
 	// scheme設定
 	scheme := runtime.NewScheme()

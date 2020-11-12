@@ -4,19 +4,20 @@ import "github.com/streadway/amqp"
 
 // Amqp はMQとの通信に必要なデータの定義
 type Amqp struct {
-	channel  *amqp.Channel
-	queue    amqp.Queue
-	messages <-chan amqp.Delivery
+	connection *amqp.Connection
+	channel    *amqp.Channel
+	queue      amqp.Queue
+	messages   <-chan amqp.Delivery
 }
 
 // NewClient はConsumerとしての接続までをする
 func NewClient(url string) (mq Amqp, err error) {
-	conn, err := amqp.Dial(url)
+	mq.connection, err = amqp.Dial(url)
 	if err != nil {
 		return mq, err
 	}
 
-	mq.channel, err = conn.Channel()
+	mq.channel, err = mq.connection.Channel()
 	if err != nil {
 		return mq, err
 	}
@@ -59,4 +60,10 @@ func (a Amqp) Publish(msg []byte) error {
 		},
 	)
 	return nil
+}
+
+// Close はconnectionとchannelを閉じます
+func (a *Amqp) Close() {
+	a.connection.Close()
+	a.channel.Close()
 }

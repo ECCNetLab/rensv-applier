@@ -4,25 +4,25 @@ import "github.com/streadway/amqp"
 
 // Amqp はMQとの通信に必要なデータの定義
 type Amqp struct {
-	connection *amqp.Connection
-	channel    *amqp.Channel
-	queue      amqp.Queue
-	messages   <-chan amqp.Delivery
+	Connection *amqp.Connection
+	Channel    *amqp.Channel
+	Queue      amqp.Queue
+	Messages   <-chan amqp.Delivery
 }
 
 // NewClient はConsumerとしての接続までをする
 func NewClient(url string) (mq Amqp, err error) {
-	mq.connection, err = amqp.Dial(url)
+	mq.Connection, err = amqp.Dial(url)
 	if err != nil {
 		return mq, err
 	}
 
-	mq.channel, err = mq.connection.Channel()
+	mq.Channel, err = mq.Connection.Channel()
 	if err != nil {
 		return mq, err
 	}
 
-	mq.queue, err = mq.channel.QueueDeclare(
+	mq.Queue, err = mq.Channel.QueueDeclare(
 		"rensv", // name
 		false,   // durable
 		false,   // delete when unused
@@ -34,8 +34,8 @@ func NewClient(url string) (mq Amqp, err error) {
 		return mq, err
 	}
 
-	mq.messages, err = mq.channel.Consume(
-		mq.queue.Name, // queue
+	mq.Messages, err = mq.Channel.Consume(
+		mq.Queue.Name, // queue
 		"",            // consumer
 		true,          // auto-ack
 		false,         // exclusive
@@ -49,9 +49,9 @@ func NewClient(url string) (mq Amqp, err error) {
 
 // Publish は引数のデータをqueueに投げる
 func (a Amqp) Publish(msg []byte) error {
-	a.channel.Publish(
+	a.Channel.Publish(
 		"",           // exchange
-		a.queue.Name, // routing key
+		a.Queue.Name, // routing key
 		false,        // mandatory
 		false,        // immediate
 		amqp.Publishing{
@@ -62,8 +62,8 @@ func (a Amqp) Publish(msg []byte) error {
 	return nil
 }
 
-// Close はconnectionとchannelを閉じます
+// Close はConnectionとChannelを閉じます
 func (a *Amqp) Close() {
-	a.connection.Close()
-	a.channel.Close()
+	a.Connection.Close()
+	a.Channel.Close()
 }

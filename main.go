@@ -44,7 +44,7 @@ func main() {
 	forever := make(chan bool)
 
 	go func() {
-		for d := range queue.messages {
+		for d := range queue.Messages {
 			// メッセージを受け取った時の処理
 			var body Rensv
 			log.Printf("Received a message: %s", d.Body)

@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"math"
+	"time"
 
 	rensvv1 "github.com/ECCNetLab/rensv-controller/api/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -16,6 +18,7 @@ import (
 type Rensv struct {
 	DocumentRoot string `json:"documentRoot"`
 	ServerName   string `json:"serverName"`
+	FailedCount  int    `json:"failedCount"`
 }
 
 func main() {
@@ -51,6 +54,7 @@ func main() {
 			json.Unmarshal(d.Body, &body)
 			log.Printf("DocumentRoot: %s\n", body.DocumentRoot)
 			log.Printf("ServerName: %s\n", body.ServerName)
+			log.Printf("FailedCount: %d\n", body.FailedCount)
 
 			// applyするデータ生成
 			rensvConfig := &rensvv1.Rensv{
@@ -75,11 +79,19 @@ func main() {
 			if err != nil {
 				// apply失敗
 				log.Printf("Error while creating object: %s\n", err)
-				err = queue.Publish(d.Body)
-				log.Printf(" [x] Requeue %s", d.Body)
-				if err != nil {
-					log.Printf("Failed to publish a message: %s\n", err)
-				}
+				// 失敗回数をカウントアップ
+				body.FailedCount++
+				data, _ := json.Marshal(body)
+				// goroutineで待機後、republishする
+				go func() {
+					s := math.Pow(2, float64(body.FailedCount))
+					log.Printf(" [x]  After %.0f seconds, republish %s", s, d.Body)
+					time.Sleep(time.Duration(s) * time.Second)
+					err = queue.Publish(data)
+					if err != nil {
+						log.Printf("Failed to republish a message: %s\n", err)
+					}
+				}()
 			} else {
 				// apply成功
 				log.Printf("object created: %v\n", result)

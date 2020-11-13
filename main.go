@@ -52,9 +52,9 @@ func main() {
 			var body Rensv
 			log.Printf("Received a message: %s", d.Body)
 			json.Unmarshal(d.Body, &body)
-			log.Printf("DocumentRoot: %s\n", body.DocumentRoot)
-			log.Printf("ServerName: %s\n", body.ServerName)
-			log.Printf("FailedCount: %d\n", body.FailedCount)
+			// log.Printf("DocumentRoot: %s\n", body.DocumentRoot)
+			// log.Printf("ServerName: %s\n", body.ServerName)
+			// log.Printf("FailedCount: %d\n", body.FailedCount)
 
 			// applyするデータ生成
 			rensvConfig := &rensvv1.Rensv{
@@ -90,7 +90,7 @@ func main() {
 				// goroutineで待機後、republishする
 				go func() {
 					s := math.Pow(2, float64(body.FailedCount))
-					log.Printf(" [x]  After %.0f seconds, republish %s", s, d.Body)
+					log.Printf(" [x]  After %.0f seconds, republish: %s\n", s, d.Body)
 					time.Sleep(time.Duration(s) * time.Second)
 					err = queue.Publish(data)
 					if err != nil {
@@ -99,7 +99,7 @@ func main() {
 				}()
 			} else {
 				// apply成功
-				log.Printf("object created: %v\n", result)
+				log.Printf("Object created: %v\n", result)
 			}
 		}
 	}()

@@ -79,6 +79,11 @@ func main() {
 			if err != nil {
 				// apply失敗
 				log.Printf("Error while creating object: %s\n", err)
+				// 5回以上失敗した場合、破棄する
+				if body.FailedCount >= 5 {
+					log.Printf("Failed to apply: %s\n", d.Body)
+					continue
+				}
 				// 失敗回数をカウントアップ
 				body.FailedCount++
 				data, _ := json.Marshal(body)

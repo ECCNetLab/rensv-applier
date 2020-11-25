@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"math"
 	"time"
@@ -21,9 +22,35 @@ type Rensv struct {
 	FailedCount  int    `json:"failedCount"`
 }
 
+// MQの認証情報関係
+type Auth struct {
+	User        string
+	Password    string
+	Host        string
+	Port        int
+	VirtualHost string
+}
+
+// 引数と環境変数から認証情報を取得する
+func GetArgsAndEnv() *Auth {
+	a := Auth{}
+	a.User = ""
+	a.Password = ""
+	a.Host = ""
+	a.Port = 0
+	a.VirtualHost = ""
+	return &a
+}
+
+// MQ接続用URIを生成する
+func (a *Auth) Uri() string {
+	return fmt.Sprintf("amqp://%s:%s@%s:%d%s", a.User, a.Password, a.Host, a.Port, a.VirtualHost)
+}
+
 func main() {
 	// MQ接続
-	queue, err := NewClient("amqp://guest:guest@127.0.0.1:5672/")
+	auth := GetArgsAndEnv()
+	queue, err := NewClient(auth.Uri())
 	FailOnError(err)
 	defer queue.Close()
 

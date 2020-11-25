@@ -3,12 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"flag"
-	"fmt"
 	"log"
 	"math"
-	"os"
-	"strings"
 	"time"
 
 	rensvv1 "github.com/ECCNetLab/rensv-controller/api/v1"
@@ -23,37 +19,6 @@ type Rensv struct {
 	DocumentRoot string `json:"documentRoot"`
 	ServerName   string `json:"serverName"`
 	FailedCount  int    `json:"failedCount"`
-}
-
-// Auth はRabbitMQの認証に必要な情報の定義
-type Auth struct {
-	Username    string
-	Password    string
-	Host        string
-	Port        int
-	VirtualHost string
-}
-
-// GetArgsAndEnv は引数と環境変数から認証情報を取得する
-func GetArgsAndEnv() *Auth {
-	a := Auth{}
-	flag.StringVar(&a.Username, "username", "guest", "RabbitMQ username")
-	flag.StringVar(&a.Password, "password", "guest", "RabbitMQ password")
-	flag.StringVar(&a.Host, "host", "rabbitmq", "RabbitMQ hostname")
-	flag.IntVar(&a.Port, "port", 5672, "RabbitMQ port")
-	flag.StringVar(&a.VirtualHost, "virtualhost", "/", "RabbitMQ virtualhost")
-	flag.VisitAll(func(f *flag.Flag) {
-		if s := os.Getenv(strings.ToUpper(f.Name)); s != "" {
-			flag.Set(f.Name, s)
-		}
-	})
-	flag.Parse()
-	return &a
-}
-
-// URI はMQ接続用URIを生成する
-func (a *Auth) URI() string {
-	return fmt.Sprintf("amqp://%s:%s@%s:%d%s", a.Username, a.Password, a.Host, a.Port, a.VirtualHost)
 }
 
 func main() {

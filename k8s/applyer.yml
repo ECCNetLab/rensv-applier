@@ -16,7 +16,7 @@ spec:
       serviceAccountName: applyer-sa
       containers:
       - name: applyer
-        image: rensv-applyer:v1
+        image: rensv-applyer:v1.1
         imagePullPolicy: IfNotPresent
         resources:
           limits:

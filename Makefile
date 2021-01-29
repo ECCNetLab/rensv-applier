@@ -1,5 +1,5 @@
 # Image URL to use all building/pushing image targets
-IMG ?= rensv-applyer:v1
+IMG ?= rensv-applyer:v1.1
 
 # Build the app
 build:

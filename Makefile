@@ -3,7 +3,7 @@ IMG ?= rensv-applyer:v1
 
 # Build the app
 build:
-	GOOS=linux go build -o docker/app .
+	CGO_ENABLED=0 GOOS=linux go build -o docker/app .
 
 # Build the docker image
 docker-build: build

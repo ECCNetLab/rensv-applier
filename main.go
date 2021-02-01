@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"context"
 	"encoding/json"
 	"log"
@@ -22,6 +23,9 @@ type Rensv struct {
 }
 
 func main() {
+	// apply先Namespaceを取得
+	var ns string
+	flag.StringVar(&ns, "namespace", "default", "apply destination namespace")
 	// MQ接続
 	auth := GetArgsAndEnv()
 	queue, err := NewClient(auth.URI())
@@ -72,7 +76,7 @@ func main() {
 			result := &rensvv1.Rensv{}
 			err := client.
 				Post().
-				Namespace("default").
+				Namespace(ns).
 				Resource("rensvs").
 				Body(rensvConfig).
 				Do(context.Background()).

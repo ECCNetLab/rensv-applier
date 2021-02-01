@@ -1,9 +1,9 @@
 # Image URL to use all building/pushing image targets
-IMG ?= rensv-applyer:v1
+IMG ?= rensv-applyer:v1.1
 
 # Build the app
 build:
-	GOOS=linux go build -o docker/app .
+	CGO_ENABLED=0 GOOS=linux go build -o docker/app .
 
 # Build the docker image
 docker-build: build
